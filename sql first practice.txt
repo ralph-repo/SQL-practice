@@ -1,0 +1,251 @@
+-- Online SQL Editor to Run SQL Online.
+-- Use the editor to create new tables, insert data and all other SQL operations.
+
+--CREATE TABLE students (
+--id INT PRIMARY KEY,
+--name VARCHAR(255)
+--);
+--INSERT INTO students VALUES(5, 'Shelja');
+--SELECT * FROM students;
+
+CREATE TABLE Workers (
+  WORKER_ID INT NOT NULL PRIMARY KEY,
+  FIRST_NAME CHAR(25),
+  LAST_NAME CHAR(25),
+  SALARY INT(15),
+  JOINING_DATE DATETIME,
+  DEPARTMENT CHAR(25)
+);
+INSERT INTO Workers 
+	(WORKER_ID, FIRST_NAME, LAST_NAME, SALARY, JOINING_DATE, DEPARTMENT) VALUES
+    (001, 'Bhumika', 'Sharma', 100000, '14-02-2020 09.00.00', 'HR' ),
+    (002, 'Ritik', 'Sharma', 60000, '14-02-2020 09.00.00', 'Admin' ),
+    (003, 'Rishabh', 'Verma', 70000, '14-02-2020 09.00.00', 'Admin' ),
+    (004, 'Deepak', 'Jadon', 75000, '14-02-2020 09.00.00', 'HR' ),
+    (005, 'Priyanshu', 'Singh', 30000, '14-02-2020 09.00.00', 'Accounts' ),
+    (006, 'Fareha', 'Mohammadi', 10000, '14-02-2020 09.00.00', 'Accounts' ),
+    (007, 'Kalyan', 'Gupta', 10000, '14-02-2020 09.00.00', 'HR' ),
+    (008, 'Saniya', 'Bansal', 25000, '14-02-2020 09.00.00', 'Admin' );
+    
+CREATE TABLE Bonus (
+  WORKER_REF_ID INT,
+  BONUS_AMOUNT INT(10),
+  BONUS_DATE DATETIME,
+  FOREIGN KEY (WORKER_REF_ID)
+  	REFERENCES Workers(WORKER_ID)
+  	ON DELETE CASCADE
+);
+
+
+INSERT INTO BONUS
+	(WORKER_REF_ID, BONUS_AMOUNT, BONUS_DATE) VALUES
+    	(001, 5000, '16-02-20'),
+	(002, 3000, '16-06-11'),
+        (003, 4000, '16-02-20'),
+        (001, 4500, '16-02-20'),
+        (002, 3500, '16-02-11');
+
+CREATE TABLE Title(
+  WORKER_REF_ID INT,
+  WORKER_TITLE CHAR(25),
+  AFFECTED_FROM DATETIME,
+  FOREIGN KEY (WORKER_REF_ID)
+  	REFERENCES Workers(WORKER_ID)
+  	ON DELETE CASCADE
+);
+
+INSERT INTO Title
+	(WORKER_REF_ID, WORKER_TITLE, AFFECTED_FROM) VALUES
+    (001, 'Manager', '2016-02-20 00:00:00'),
+    (002, 'Executive', '2016-02-20 00:00:00'),
+    (008, 'Executive', '2016-02-20 00:00:00'),
+    (005, 'Manager', '2016-02-20 00:00:00'),
+    (004, 'Asst. Manager', '2016-02-20 00:00:00'),
+    (007, 'Executive', '2016-02-20 00:00:00'),
+    (006, 'Lead', '2016-02-20 00:00:00'),
+    (003, 'Lead', '2016-02-20 00:00:00');
+
+//for selecting different column
+SELECT FIRST_NAME, SALARY, DEPARTMENT FROM Workers;
+
+
+
+//can we use select keyword without using FROM clause?
+SELECT 44+11, 29+30;
+SELECT now();
+SELECT LOWER('riTIK');
+SELECT UPPER('riTIK');
+
+
+
+//WHERE clause is use to apply a condition on SELECT
+SELECT * FROM Workers WHERE SALARY > 70000;
+SELECT * FROM Workers WHERE Department = 'HR';
+
+
+
+//BETWEEN clause is used to select from a inclusive range
+SELECT * FROM Workers WHERE SALARY BETWEEN 20000 AND 70000;
+
+
+
+//IN clause reduce OR conditions
+SELECT * FROM Workers WHERE DEPARTMENT = 'HR' OR DEPARTMENT = 'Accounts';
+SELECT * FROM Workers WHERE DEPARTMENT IN('HR','Accounts');
+
+
+
+//AND/OR/NOT clause are used in condition
+SELECT * FROM Workers WHERE DEPARTMENT NOT IN('Accounts');
+
+
+
+//pattern searching / wildcards '%' '_'
+//'%' means any number of chracters like '*'
+//'_' means only one character
+SELECT * FROM Workers WHERE FIRST_NAME LIKE '%E%';
+SELECT * FROM Workers WHERE FIRST_NAME LIKE '_A%';
+SELECT * FROM Workers WHERE FIRST_NAME LIKE '_H_____';
+
+
+
+//sorting in tables done by clause ORDER BY (ASC is 'default')
+SELECT * FROM Workers ORDER BY Salary;
+SELECT * FROM Workers ORDER BY Salary DESC;
+
+
+
+//distinct column entries using DISTINCT
+SELECT DISTINCT DEPARTMENT FROM Workers;
+
+
+
+//DATA GROUPING is used for finding nummber of employees working in each department
+//i.e. department wise aggregation , it means GROUPING is done for getting count value
+//GROUP BY clause is used used with aggregate functions like
+// AVG, SUM, COUNT, MIN, MAX
+SELECT Department FROM Workers GROUP BY Department;
+SELECT Department, COUNT(Department) FROM Workers GROUP BY Department;
+//without aggregation function GROUP BY acts as DISTINCT
+
+
+
+
+//find average salary per deptt.
+SELECT Department, AVG(Salary) FROM Workers GROUP BY Department;
+SELECT Department, AVG(Salary) FROM Workers GROUP BY Department ORDER BY AVG(Salary) DESC;
+
+
+//find per departmment minimum salary
+SELECT Department, MIN(Salary) FROM Workers GROUP BY Department ORDER BY MIN(Salary);
+
+
+//find per department total Salary
+SELECT Department, SUM(Salary) FROM Workers GROUP BY Department;
+
+
+
+//HAVING clause is used with GROUP BY
+//it  is similar to (not equal to) WHERE used in SELECT
+SELECT Department, COUNT(Department) FROM Workers GROUP BY Department HAVING COUNT(Department) > 2;
+//WHERE can't be used with  GROUP BY
+
+
+
+//constraints -: PRIMARY KEY clause
+//FOREIGN KEY clause
+//UNIQUE clause
+//CHECK clause
+//DEFAULT clause
+CREATE TABLE Accounts (
+  id INT PRIMARY KEY,
+  name VARCHAR(255) UNIQUE,
+  starting_balance INT NOT NULL DEFAULT 0,
+  balance INT,
+  CONSTRAINT acc_blc_chk CHECK(balance > 1000)
+  );
+
+INSERT INTO Accounts
+	(id, name, balance, starting_balance) VALUES
+    (1, 'A', 1000, 150)
+
+INSERT INTO Accounts
+	(id, name) VALUES
+    (3, 'b')
+
+//ALTER TABLES operations -- ADD new column
+ALTER TABLE Accounts ADD interest FLOAT NOT NULL DEFAULT 0;
+ALTER TABLE Accounts_Details ADD City VARCHAR(255);
+
+
+//MODIFY clause used to change data type
+ ALTER TABLE Accounts MODIFY interest DOUBLE NOT NULL DEFAULT 0;
+
+
+//rename the column (CHANGE COLUMN or RENAME COLUMN)
+ ALTER TABLE Accounts RENAME COLUMN interest TO saving_interest;
+ ALTER TABLE Accounts CHANGE COLUMN interest saving_interest FLOAT NOT NULL DEFAULT 0;
+
+
+
+//DROP COLUMN dropping  a column
+ALTER TABLE Accounts DROP COLUMN saving_interest;
+
+
+//renaming a table RENAME TO
+ALTER TABLE Accounts RENAME TO Accounts_Details;
+
+
+//data modification language
+//INSERT clause
+INSERT INTO Accounts_Details 
+	(id, name, starting_balance, balance) VALUES
+    (4, 'C', 0, 10000);
+
+
+//UPDATE clause
+UPDATE Accounts_Details SET balance=3000, name='Bgrew' WHERE id=2;
+UPDATE Accounts_Details SET City = 'Aligarh';
+
+//DELETE   tupple using DELETE clause
+DELETE FROM Accounts_Details WHERE id=3;
+//delete a whole table
+DELETE FROM Accounts_Details;
+//ON DELETE CASCADE and ON DELETE NULL
+//these keywords used at the time of initalisation of FOREIGN KEY
+//they lets delet from parent table even if child tabble has that data
+
+
+//REPLACE clause
+//data already present -> REPLACE
+//data not present -> INSERT
+REPLACE INTO Workers (WORKER_ID, FIRST_NAME)
+		VALUES(9, 'Pankaj');
+REPLACE INTO Workers SET WORKER_ID=7, FIRST_NAME='Kalyan', LAST_NAME='Gupta';
+
+
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
